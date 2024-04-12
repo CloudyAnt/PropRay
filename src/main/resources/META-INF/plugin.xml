@@ -1,0 +1,19 @@
+<idea-plugin>
+    <id>cn.itscloudy.propray</id>
+    <name>PropRay</name>
+    <version>0.0.1</version>
+    <vendor email="iiim.cloudy@gmail.com" url="https://cloudyant.github.io/">PropRay</vendor>
+
+    <idea-version since-build="222"/>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="cn.itscloudy.propray.PrStartupActivity"/>
+    </extensions>
+    <actions>
+        <action class="cn.itscloudy.propray.PrEditorButton"
+                description="PropRay" id="PrEditorButton" text="PropRay" icon="/icons/ray.png">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>

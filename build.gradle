@@ -1,0 +1,41 @@
+plugins {
+    id 'org.jetbrains.intellij' version '1.16.0'
+    id 'java'
+}
+
+apply from: 'preTask.gradle'
+
+group 'cn.itscloudy.propray'
+version '1.0.0'
+repositories {
+    mavenCentral()
+}
+
+intellij {
+    plugins = ['com.intellij.java']
+}
+intellij {
+    localPath = project.findProperty("localPath") ?: "/Applications/IntelliJ IDEA.app/Contents"
+    intellij.updateSinceUntilBuild = false
+}
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+}
+
+processResources {
+    from('src/main/resources') {
+        include '*.properties'
+        include '*.xml'
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+}
+test {
+    useJUnitPlatform()
+}
+tasks.test {
+    systemProperty("idea.force.use.core.classloader", "true")
+}
