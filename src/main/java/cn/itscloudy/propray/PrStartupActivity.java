@@ -10,17 +10,36 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class PrStartupActivity implements StartupActivity {
+public class PrStartupActivity implements StartupActivity, ProjectActivity {
 
     boolean ran;
 
     @Override
     public void runActivity(@NotNull Project project) {
+        runProjectActivity(project);
+    }
+
+    @Nullable
+    @Override
+    public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
+        runProjectActivity(project);
+        return null;
+    }
+
+    private void runProjectActivity(@NotNull Project project) {
+        runAppActivity(project);
+    }
+
+    private void runAppActivity(@NotNull Project project) {
         if (!ran) {
             DumbService.getInstance(project).smartInvokeLater(() ->
                     ProgressManager.getInstance().run(new InitTask(project)));
@@ -65,12 +84,12 @@ public class PrStartupActivity implements StartupActivity {
             if (virtualFile == null || !"properties".equals(virtualFile.getExtension())) {
                 return;
             }
-            PropRay.install(editor);
+            PropRayInstaller.install(editor);
         }
 
         @Override
         public void editorReleased(@NotNull EditorFactoryEvent event) {
-            PropRay.uninstall(event.getEditor());
+            PropRayInstaller.uninstall(event.getEditor());
         }
     }
 }

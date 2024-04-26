@@ -10,10 +10,4 @@
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="cn.itscloudy.propray.PrStartupActivity"/>
     </extensions>
-    <actions>
-        <action class="cn.itscloudy.propray.PrEditorButton"
-                description="PropRay" id="PrEditorButton" text="PropRay" icon="/icons/ray.png">
-            <add-to-group group-id="GenerateGroup" anchor="first"/>
-        </action>
-    </actions>
 </idea-plugin>

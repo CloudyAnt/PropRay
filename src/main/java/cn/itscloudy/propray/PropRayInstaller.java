@@ -8,15 +8,13 @@ import com.intellij.ui.components.JBLayeredPane;
 import javax.swing.*;
 import java.awt.*;
 
-public class PropRay {
-    private static final Key<PropRay> KEY = Key.create(PropRay.class.getName());
-    private static final int W = 200;
-    private static final int H = 200;
+public class PropRayInstaller {
+    private static final Key<PropRayInstaller> KEY = Key.create(PropRayInstaller.class.getName());
 
     private final Editor editor;
     private final JBLayeredPane layeredPane;
 
-    private PropRay(Editor editor, JBLayeredPane layeredPane) {
+    private PropRayInstaller(Editor editor, JBLayeredPane layeredPane) {
         this.editor = editor;
         this.layeredPane = layeredPane;
     }
@@ -30,9 +28,9 @@ public class PropRay {
             }
         }
 
-        PropRay propRay = new PropRay(editor, (JBLayeredPane) comp);
-        editor.putUserData(KEY, propRay);
-        ApplicationManager.getApplication().executeOnPooledThread(propRay::init);
+        PropRayInstaller propRayInstaller = new PropRayInstaller(editor, (JBLayeredPane) comp);
+        editor.putUserData(KEY, propRayInstaller);
+        ApplicationManager.getApplication().executeOnPooledThread(propRayInstaller::init);
     }
 
     static void uninstall(Editor editor) {
@@ -41,9 +39,14 @@ public class PropRay {
 
 
     void init() {
-        JPanel p = new ControlBox().getRoot();
-        layeredPane.add(p);
-        layeredPane.setLayer(p, 100);
+        ControlBox controlBox = new ControlBox();
+        JComponent switchButton = controlBox.getSwitchButton();
+        layeredPane.add(switchButton);
+        layeredPane.setLayer(switchButton, 100);
+
+        JPanel box = controlBox.getRoot();
+        layeredPane.add(box);
+        layeredPane.setLayer(box, 100);
         // Do something
     }
 }
