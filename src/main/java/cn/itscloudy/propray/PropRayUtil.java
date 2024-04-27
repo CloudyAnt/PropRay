@@ -48,4 +48,18 @@ public class PropRayUtil {
         }
         return sb.toString();
     }
+
+    public static String reverse(String text) {
+        char[] chars = text.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for (char c : chars) {
+            if (c < 128) {
+                sb.append(c);
+            } else {
+                String hex = Integer.toHexString(c);
+                sb.append("\\u").append(hex);
+            }
+        }
+        return sb.toString();
+    }
 }

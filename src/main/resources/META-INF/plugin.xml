@@ -10,4 +10,9 @@
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="cn.itscloudy.propray.PrStartupActivity"/>
     </extensions>
+    <actions>
+        <action class="cn.itscloudy.propray.PropRayReplaceAction" icon="/icons/ray.png">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+    </actions>
 </idea-plugin>
