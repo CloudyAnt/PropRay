@@ -1,6 +1,8 @@
 package cn.itscloudy.propray;
 
 import cn.itscloudy.propray.ui.ArrowBubbleBorder;
+import cn.itscloudy.propray.ui.ArrowBubbleBorderPanel;
+import cn.itscloudy.propray.ui.RoundCornerLabel;
 import cn.itscloudy.propray.ui.SwingUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBPanel;
@@ -13,8 +15,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ControlBox {
-    private static final int ROOT_Y = 70;
-    private static final int RIGHT_OFFSET = 60;
+    private static final int ROOT_Y = 40;
+    private static final int RIGHT_OFFSET = 40;
+    private static final Color BORDER_COLOR = Color.decode("#00818F");
 
     @Getter
     private JPanel root;
@@ -26,14 +29,15 @@ public class ControlBox {
     private JComponent switchButton;
 
     ControlBox() {
-        content.setBorder(new ArrowBubbleBorder(ArrowBubbleBorder.Direction.RIGHT, 5, JBColor.GRAY));
         root.setVisible(false);
-        root.setBorder(JBUI.Borders.emptyRight(switchButton.getWidth() + 2));
+        root.setBorder(JBUI.Borders.emptyRight(SwitchButton.W + RIGHT_OFFSET + 2));
     }
 
     private void createUIComponents() {
         root = new Root();
         switchButton = new SwitchButton();
+        ArrowBubbleBorder.Direction bubbleDirection = ArrowBubbleBorder.Direction.RIGHT;
+        content = new ArrowBubbleBorderPanel(new ArrowBubbleBorder(bubbleDirection, 5, BORDER_COLOR));
     }
 
     private static class Root extends JBPanel<Root> {
@@ -47,14 +51,17 @@ public class ControlBox {
         }
     }
 
-    private class SwitchButton extends JLabel {
+    private class SwitchButton extends RoundCornerLabel {
+
+        private static final int W = 30;
+        private static final int H = 30;
 
         SwitchButton() {
-            super(SwingUtil.findIcon("/icons/ray.png"));
+            super(6);
+            setIcon(SwingUtil.findIcon("/icons/ray.png"));
             setOpaque(true);
             setBackground(JBColor.WHITE);
-            setSize(new Dimension(30, 30));
-            setBorder(JBUI.Borders.emptyRight(RIGHT_OFFSET));
+            setHorizontalAlignment(SwingConstants.CENTER);
             addMouseListener(new MouseAdapter() {
 
                 @Override
@@ -66,7 +73,7 @@ public class ControlBox {
 
         @Override
         public void setBounds(int x, int y, int width, int height) {
-            super.setBounds(x, (root.getHeight() - height) / 2 + ROOT_Y, width, height);
+            super.setBounds(x + width - RIGHT_OFFSET - W, (root.getHeight() - H) / 2 + ROOT_Y, W, H);
         }
     }
 }

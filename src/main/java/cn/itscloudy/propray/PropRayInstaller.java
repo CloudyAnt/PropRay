@@ -20,11 +20,6 @@ public class PropRayInstaller {
     }
 
     static void install(Editor editor) {
-        if (true) {
-            // TODO delete this after ControlBox finished
-            return;
-        }
-
         Component comp = editor.getComponent().getComponents()[1];
         if (!(comp instanceof JBLayeredPane)) {
             comp = editor.getComponent().getComponents()[0];

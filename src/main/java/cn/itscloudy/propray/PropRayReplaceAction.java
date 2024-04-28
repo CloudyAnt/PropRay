@@ -11,8 +11,8 @@ public class PropRayReplaceAction extends AnAction {
 
     public PropRayReplaceAction() {
         Presentation tp = getTemplatePresentation();
-        tp.setText(PrConst.get("Replace2Ues"));
-        tp.setDescription(PrConst.get("Replace2UesDesc"));
+        tp.setText(PrConst.get("ConvertSelection2IsoSequence"));
+        tp.setDescription(PrConst.get("ConvertSelection2IsoSequenceDesc"));
     }
 
     @Override

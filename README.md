@@ -2,4 +2,6 @@
 
 An intellij plugin to help you see through your properties files.
 
-If you use Unicode escape sequences in your properties files, you can use this plugin to see the actual characters.
+If there are Unicode escape sequences in your properties files, you can use this plugin to see the actual characters.
+
+Also, you can convert a whole properties file to ISO-8859-1 encoding by just one click.

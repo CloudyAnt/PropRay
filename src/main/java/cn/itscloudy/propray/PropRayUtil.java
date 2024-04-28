@@ -5,7 +5,7 @@ public class PropRayUtil {
     }
 
 
-    public static String irradiate(String text) {
+    public static String scan(String text) {
         char[] chars = text.toCharArray();
         StringBuilder sb = new StringBuilder();
 
