@@ -11,8 +11,12 @@
         <postStartupActivity implementation="cn.itscloudy.propray.PrStartupActivity"/>
     </extensions>
     <actions>
-        <action class="cn.itscloudy.propray.PropRayReplaceAction" icon="/icons/ray.png">
+        <group id="cn.itscloudy.propray.rightClickMenu">
+            <separator/>
+            <action class="cn.itscloudy.propray.PropRayReplaceAction"
+                    icon="/icons/ray.png"
+                    id="cn.itscloudy.propray.PropRayReplaceAction"/>
             <add-to-group group-id="EditorPopupMenu"/>
-        </action>
+        </group>
     </actions>
 </idea-plugin>

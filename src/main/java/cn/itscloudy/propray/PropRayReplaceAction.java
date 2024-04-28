@@ -1,9 +1,6 @@
 package cn.itscloudy.propray;
 
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
@@ -11,6 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class PropRayReplaceAction extends AnAction {
+
+    public PropRayReplaceAction() {
+        Presentation tp = getTemplatePresentation();
+        tp.setText(PrConst.get("Replace2Ues"));
+        tp.setDescription(PrConst.get("Replace2UesDesc"));
+    }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
@@ -34,8 +37,6 @@ public class PropRayReplaceAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setText(PrConst.get("Replace"));
-
         Editor editor = e.getData(CommonDataKeys.EDITOR);
         boolean show = editor != null
                 && editor.getSelectionModel().getSelectionStart() != editor.getSelectionModel().getSelectionEnd()
