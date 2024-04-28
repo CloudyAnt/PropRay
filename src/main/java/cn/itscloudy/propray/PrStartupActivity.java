@@ -1,5 +1,6 @@
 package cn.itscloudy.propray;
 
+import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -19,23 +20,26 @@ import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
+
 public class PrStartupActivity implements StartupActivity, ProjectActivity {
 
     boolean ran;
 
     @Override
     public void runActivity(@NotNull Project project) {
-        runProjectActivity(project);
+        runAppAndProjectActivity(project);
     }
 
     @Nullable
     @Override
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
-        runProjectActivity(project);
+        runAppAndProjectActivity(project);
         return null;
     }
 
-    private void runProjectActivity(@NotNull Project project) {
+    private void runAppAndProjectActivity(@NotNull Project project) {
         runAppActivity(project);
     }
 
@@ -64,6 +68,8 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
             for (Editor editor : allEditors) {
                 PrEditorFactoryListener.init(editor);
             }
+
+            IdeEventQueue.getInstance().addDispatcher(new PrEventDispatcher(), this);
         }
     }
 
@@ -90,6 +96,23 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
         @Override
         public void editorReleased(@NotNull EditorFactoryEvent event) {
             PropRayInstaller.uninstall(event.getEditor());
+        }
+    }
+
+    private static class PrEventDispatcher implements IdeEventQueue.EventDispatcher {
+
+        @Override
+        public boolean dispatch(@NotNull AWTEvent awtEvent) {
+            if (awtEvent instanceof KeyEvent keyEvent &&
+                    (keyEvent.getID() == KeyEvent.KEY_TYPED || keyEvent.getID() == KeyEvent.KEY_PRESSED)) {
+                ControlBox focusedControlBox = PrContext.getInstance().getFocusedControlBox();
+                if (focusedControlBox != null) {
+                    focusedControlBox.afterKeyTyped(keyEvent);
+                    keyEvent.consume();
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

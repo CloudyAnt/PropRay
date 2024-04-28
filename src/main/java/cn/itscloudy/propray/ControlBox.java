@@ -11,8 +11,7 @@ import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 public class ControlBox {
     private static final int ROOT_Y = 40;
@@ -38,6 +37,38 @@ public class ControlBox {
         switchButton = new SwitchButton();
         ArrowBubbleBorder.Direction bubbleDirection = ArrowBubbleBorder.Direction.RIGHT;
         content = new ArrowBubbleBorderPanel(new ArrowBubbleBorder(bubbleDirection, 5, BORDER_COLOR));
+        searchField = new JTextField();
+        searchField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                super.keyPressed(e);
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+            }
+        });
+        searchField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                PrContext.getInstance().unsetFocusedControlBox(ControlBox.this);
+            }
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                PrContext.getInstance().setFocusedControlBox(ControlBox.this);
+            }
+        });
+    }
+
+    public void afterKeyTyped(KeyEvent keyEvent) {
+        searchField.dispatchEvent(keyEvent);
     }
 
     private static class Root extends JBPanel<Root> {
@@ -57,7 +88,7 @@ public class ControlBox {
         private static final int H = 30;
 
         SwitchButton() {
-            super(6);
+            super(10);
             setIcon(SwingUtil.findIcon("/icons/ray.png"));
             setOpaque(true);
             setBackground(JBColor.WHITE);
