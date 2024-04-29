@@ -13,10 +13,15 @@
     <actions>
         <group id="cn.itscloudy.propray.rightClickMenu">
             <separator/>
-            <action class="cn.itscloudy.propray.PropRayReplaceAction"
-                    icon="/icons/ray.png"
-                    id="cn.itscloudy.propray.PropRayReplaceAction"/>
+            <action class="cn.itscloudy.propray.PropRayNormal2IsoAction"
+                    icon="/icons/favicon.png"
+                    id="cn.itscloudy.propray.PropRayNormal2IsoAction"/>
             <add-to-group group-id="EditorPopupMenu"/>
         </group>
+        <action class="cn.itscloudy.propray.PropRayLineScanAction"
+                icon="/icons/favicon.png"
+                id="cn.itscloudy.propray.PropRayLineScanAction">
+            <mouse-shortcut keystroke="alt button1" keymap="$default"/>
+        </action>
     </actions>
 </idea-plugin>

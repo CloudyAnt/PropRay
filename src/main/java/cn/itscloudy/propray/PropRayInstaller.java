@@ -11,11 +11,9 @@ import java.awt.*;
 public class PropRayInstaller {
     private static final Key<PropRayInstaller> KEY = Key.create(PropRayInstaller.class.getName());
 
-    private final Editor editor;
     private final JBLayeredPane layeredPane;
 
-    private PropRayInstaller(Editor editor, JBLayeredPane layeredPane) {
-        this.editor = editor;
+    private PropRayInstaller(JBLayeredPane layeredPane) {
         this.layeredPane = layeredPane;
     }
 
@@ -28,7 +26,7 @@ public class PropRayInstaller {
             }
         }
 
-        PropRayInstaller propRayInstaller = new PropRayInstaller(editor, (JBLayeredPane) comp);
+        PropRayInstaller propRayInstaller = new PropRayInstaller((JBLayeredPane) comp);
         editor.putUserData(KEY, propRayInstaller);
         ApplicationManager.getApplication().executeOnPooledThread(propRayInstaller::init);
     }

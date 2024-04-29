@@ -7,12 +7,12 @@ import com.intellij.openapi.editor.SelectionModel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-public class PropRayReplaceAction extends AnAction {
+public class PropRayNormal2IsoAction extends AnAction {
 
-    public PropRayReplaceAction() {
+    public PropRayNormal2IsoAction() {
         Presentation tp = getTemplatePresentation();
-        tp.setText(PrConst.get("ConvertSelection2IsoSequence"));
-        tp.setDescription(PrConst.get("ConvertSelection2IsoSequenceDesc"));
+        tp.setText(PrConst.get("Action.Normal2Iso"));
+        tp.setDescription(PrConst.get("Action.Normal2Iso.Desc"));
     }
 
     @Override
@@ -26,12 +26,12 @@ public class PropRayReplaceAction extends AnAction {
         if (StringUtils.isBlank(selectedText)) {
             return;
         }
-        String reversedText = PropRayUtil.reverse(selectedText);
+        String isoText = PropRayUtil.toIso(selectedText);
 
         WriteCommandAction.runWriteCommandAction(editor.getProject(), () -> {
             int offset = selectionModel.getSelectionStart();
             int end = selectionModel.getSelectionEnd();
-            editor.getDocument().replaceString(offset, end, reversedText);
+            editor.getDocument().replaceString(offset, end, isoText);
         });
     }
 
@@ -39,8 +39,8 @@ public class PropRayReplaceAction extends AnAction {
     public void update(@NotNull AnActionEvent e) {
         Editor editor = e.getData(CommonDataKeys.EDITOR);
         boolean show = editor != null
-                && editor.getSelectionModel().getSelectionStart() != editor.getSelectionModel().getSelectionEnd()
-                && "properties".equals(editor.getVirtualFile().getExtension());
+                && "properties".equals(editor.getVirtualFile().getExtension())
+                && PropRayUtil.containsNonIsoChars(editor.getSelectionModel().getSelectedText());
 
         e.getPresentation().setEnabledAndVisible(show);
     }

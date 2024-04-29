@@ -64,7 +64,7 @@ public class ControlBox {
 
         SwitchButton() {
             super(10);
-            setIcon(SwingUtil.findIcon("/icons/ray.png"));
+            setIcon(SwingUtil.findIcon("/icons/favicon.png"));
             setOpaque(true);
             setBackground(JBColor.WHITE);
             setHorizontalAlignment(SwingConstants.CENTER);

@@ -4,11 +4,17 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.util.ReflectionUtil;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 
 public class SwingUtil {
     private SwingUtil() {
+    }
+
+    public static int getBaselineY(FontMetrics fontMetrics, int lineHeight) {
+        int fontHeight = fontMetrics.getAscent() + fontMetrics.getDescent();
+        return Math.round(((float) lineHeight - fontHeight) / 2) + fontMetrics.getAscent() + fontMetrics.getLeading();
     }
 
     public static Area getRoundRectangle(int width, int height, int radius, int offset) {
