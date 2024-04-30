@@ -2,8 +2,7 @@ package cn.itscloudy.propray;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.event.DocumentEvent;
-import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBLayeredPane;
 import org.jetbrains.annotations.NotNull;
@@ -11,13 +10,13 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 
-public class PropRayInstaller {
-    private static final Key<PropRayInstaller> KEY = Key.create(PropRayInstaller.class.getName());
+public class PropRayEditorAffairs {
+    private static final Key<PropRayEditorAffairs> KEY = Key.create(PropRayEditorAffairs.class.getName());
 
     private final Editor editor;
     private final JBLayeredPane layeredPane;
 
-    private PropRayInstaller(Editor editor, JBLayeredPane layeredPane) {
+    private PropRayEditorAffairs(Editor editor, JBLayeredPane layeredPane) {
         this.editor = editor;
         this.layeredPane = layeredPane;
     }
@@ -31,9 +30,9 @@ public class PropRayInstaller {
             }
         }
 
-        PropRayInstaller propRayInstaller = new PropRayInstaller(editor, (JBLayeredPane) comp);
-        editor.putUserData(KEY, propRayInstaller);
-        ApplicationManager.getApplication().executeOnPooledThread(propRayInstaller::init);
+        PropRayEditorAffairs propRayEditorAffairs = new PropRayEditorAffairs(editor, (JBLayeredPane) comp);
+        editor.putUserData(KEY, propRayEditorAffairs);
+        ApplicationManager.getApplication().executeOnPooledThread(propRayEditorAffairs::init);
     }
 
     static void uninstall(Editor editor) {

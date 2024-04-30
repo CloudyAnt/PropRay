@@ -15,10 +15,11 @@ import java.util.function.Consumer;
 
 public class PropRayCanvas extends JComponent {
 
-    private final Editor editor;
+    private final transient Editor editor;
     private static final Key<PropRayCanvas> KEY = Key.create("PropRayCanvas");
     private final List<PropRayIso2NormalMask> propRayIso2NormalMasks = new ArrayList<>();
     private final Font font;
+    private final transient Object modLock = new Object();
 
     PropRayCanvas(Editor editor) {
         this.editor = editor;
@@ -53,6 +54,19 @@ public class PropRayCanvas extends JComponent {
         }
     }
 
+    public boolean removeIfContains(int visualLineStart, int visualLineEnd) {
+        for (PropRayIso2NormalMask mask : propRayIso2NormalMasks) {
+            if (mask.getStartOffset() == visualLineStart && mask.getEndOffset() == visualLineEnd) {
+                synchronized (modLock) {
+                    propRayIso2NormalMasks.remove(mask);
+                    repaint();
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void unbind() {
         removeAll();
         editor.putUserData(KEY, null);
@@ -67,8 +81,10 @@ public class PropRayCanvas extends JComponent {
         if (propRayIso2NormalMasks.isEmpty()) {
             return;
         }
-        propRayIso2NormalMasks.clear();
-        repaint();
+        synchronized (modLock) {
+            propRayIso2NormalMasks.clear();
+            repaint();
+        }
     }
 
     public void clearAndAdd(PropRayIso2NormalMask propRayIso2NormalMask) {

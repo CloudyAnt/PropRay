@@ -4,8 +4,7 @@ import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.editor.event.EditorFactoryListener;
+import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -58,6 +57,7 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
 
         @Override
         public void dispose() {
+            // nothing to dispose
         }
 
         @Override
@@ -70,6 +70,13 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
             }
 
             IdeEventQueue.getInstance().addDispatcher(new PrEventDispatcher(), this);
+            EditorEventMulticaster eventMulticaster = EditorFactory.getInstance().getEventMulticaster();
+            eventMulticaster.addSelectionListener(new SelectionListener() {
+                @Override
+                public void selectionChanged(@NotNull SelectionEvent e) {
+                    PropRayCanvas.getOrBind(e.getEditor()).clear();
+                }
+            }, this);
         }
     }
 
@@ -90,12 +97,12 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
             if (virtualFile == null || !"properties".equals(virtualFile.getExtension())) {
                 return;
             }
-            PropRayInstaller.install(editor);
+            PropRayEditorAffairs.install(editor);
         }
 
         @Override
         public void editorReleased(@NotNull EditorFactoryEvent event) {
-            PropRayInstaller.uninstall(event.getEditor());
+            PropRayEditorAffairs.uninstall(event.getEditor());
         }
     }
 

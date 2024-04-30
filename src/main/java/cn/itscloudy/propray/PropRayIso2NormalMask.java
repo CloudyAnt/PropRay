@@ -3,11 +3,14 @@ package cn.itscloudy.propray;
 import cn.itscloudy.propray.ui.SwingUtil;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.ColorKey;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
+import lombok.Getter;
 
 import java.awt.*;
 
@@ -21,14 +24,19 @@ public class PropRayIso2NormalMask {
     private String newText;
     private final PropRayCanvas replacementLayerCanvas;
     private final Editor editor;
+    @Getter
+    private final int startOffset;
+    @Getter
     private final int endOffset;
     private Rectangle cover;
+    private Rectangle blankCover;
     private String coveredText;
 
     private static final Color MARK_COLOR = JBColor.WHITE;
     private static final Color FONT_COLOR = JBColor.BLACK;
     PropRayIso2NormalMask(Editor editor, int endOffset, String newText, String coveredText) {
         this.editor = editor;
+        this.startOffset = endOffset - coveredText.length();
         this.endOffset = endOffset;
         this.replacementLayerCanvas = PropRayCanvas.getOrBind(editor);
         replacementLayerCanvas.clearAndAdd(this);
@@ -42,6 +50,12 @@ public class PropRayIso2NormalMask {
         }
         g.setColor(MARK_COLOR);
         g.fillRect(cover.x, cover.y, cover.width, cover.height);
+        Color caretRowColor = EditorColorsManager.getInstance().getSchemeForCurrentUITheme()
+                .getColor(ColorKey.find("CARET_ROW_COLOR"));
+        if (caretRowColor != null) {
+            g.setColor(caretRowColor);
+            g.fillRect(blankCover.x, blankCover.y, blankCover.width, blankCover.height);
+        }
         g.setFont(font);
         g.setColor(FONT_COLOR);
         g.drawString(newText, cover.x, cover.y + baseLineY);
@@ -59,16 +73,21 @@ public class PropRayIso2NormalMask {
         int replacedTextWidth = fontMetrics.stringWidth(coveredText);
         int newTextRequiredWidth = fontMetrics.stringWidth(newText);
 
-        // 更新 cover
+        // cover for new text
         Point recTopRight = editor.offsetToXY(endOffset);
-        int markWidth = Math.max(replacedTextWidth, newTextRequiredWidth);
-        int x = recTopRight.x - markWidth;
-        cover = new Rectangle(x, recTopRight.y, markWidth, requiredHeight);
+        int x = recTopRight.x - replacedTextWidth;
+        cover = new Rectangle(x, recTopRight.y, replacedTextWidth, requiredHeight);
+
+        // covert for blank space
+        int blankCoverWidth = replacedTextWidth - newTextRequiredWidth;
+        int x1 = recTopRight.x - blankCoverWidth;
+
+        // width +1 to make sure the caret is not visible
+        blankCover = new Rectangle(x1, recTopRight.y, blankCoverWidth + 1, requiredHeight);
         replacementLayerCanvas.repaint();
     }
 
     public void modifyDocument(Document document) {
-        int startOffset = endOffset - coveredText.length();
         document.replaceString(startOffset, endOffset, newText);
     }
 
