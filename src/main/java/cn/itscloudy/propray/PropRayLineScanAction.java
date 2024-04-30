@@ -20,10 +20,22 @@ public class PropRayLineScanAction extends AnAction {
         }
     }
 
+    int lastLineStart = -1;
+    int lastLineEnd = -1;
+
     private void act(Editor editor) {
         CaretModel caretModel = editor.getCaretModel();
         int visualLineStart = caretModel.getVisualLineStart();
         int visualLineEnd = caretModel.getVisualLineEnd();
+        if (visualLineStart == lastLineStart && visualLineEnd == lastLineEnd) {
+            PropRayCanvas.getOrBind(editor).clear();
+            lastLineStart = -1;
+            lastLineEnd = -1;
+            return;
+        }
+        lastLineStart = visualLineStart;
+        lastLineEnd = visualLineEnd;
+
         String iso = editor.getDocument().getText(new TextRange(visualLineStart, visualLineEnd));
         if (iso.endsWith("\n")) {
             iso = iso.substring(0, iso.length() - 1);

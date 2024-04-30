@@ -26,9 +26,7 @@ public class PropRayIso2NormalMask {
     private String coveredText;
 
     private static final Color MARK_COLOR = JBColor.WHITE;
-    private static final Color FONT_COLOR =
-            new JBColor(new Color(122, 121, 123), new Color(120, 119, 121));
-
+    private static final Color FONT_COLOR = JBColor.BLACK;
     PropRayIso2NormalMask(Editor editor, int endOffset, String newText, String coveredText) {
         this.editor = editor;
         this.endOffset = endOffset;
@@ -45,7 +43,7 @@ public class PropRayIso2NormalMask {
         g.setColor(MARK_COLOR);
         g.fillRect(cover.x, cover.y, cover.width, cover.height);
         g.setFont(font);
-        g.setColor(JBColor.BLACK);
+        g.setColor(FONT_COLOR);
         g.drawString(newText, cover.x, cover.y + baseLineY);
     }
 

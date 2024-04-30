@@ -63,6 +63,14 @@ public class PropRayCanvas extends JComponent {
         setBounds(0, 0, contentComponent.getWidth(), contentComponent.getHeight());
     }
 
+    public void clear() {
+        if (propRayIso2NormalMasks.isEmpty()) {
+            return;
+        }
+        propRayIso2NormalMasks.clear();
+        repaint();
+    }
+
     public void clearAndAdd(PropRayIso2NormalMask propRayIso2NormalMask) {
         propRayIso2NormalMasks.clear();
         propRayIso2NormalMasks.add(propRayIso2NormalMask);

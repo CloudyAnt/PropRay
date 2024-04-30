@@ -2,8 +2,11 @@ package cn.itscloudy.propray;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBLayeredPane;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,9 +14,11 @@ import java.awt.*;
 public class PropRayInstaller {
     private static final Key<PropRayInstaller> KEY = Key.create(PropRayInstaller.class.getName());
 
+    private final Editor editor;
     private final JBLayeredPane layeredPane;
 
-    private PropRayInstaller(JBLayeredPane layeredPane) {
+    private PropRayInstaller(Editor editor, JBLayeredPane layeredPane) {
+        this.editor = editor;
         this.layeredPane = layeredPane;
     }
 
@@ -26,7 +31,7 @@ public class PropRayInstaller {
             }
         }
 
-        PropRayInstaller propRayInstaller = new PropRayInstaller((JBLayeredPane) comp);
+        PropRayInstaller propRayInstaller = new PropRayInstaller(editor, (JBLayeredPane) comp);
         editor.putUserData(KEY, propRayInstaller);
         ApplicationManager.getApplication().executeOnPooledThread(propRayInstaller::init);
     }
@@ -45,6 +50,13 @@ public class PropRayInstaller {
         JPanel box = controlBox.getRoot();
         layeredPane.add(box);
         layeredPane.setLayer(box, 100);
-        // Do something
+
+
+        editor.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void documentChanged(@NotNull DocumentEvent event) {
+                PropRayCanvas.getOrBind(editor).clear();
+            }
+        });
     }
 }
