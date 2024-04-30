@@ -63,14 +63,13 @@ public class PropRayCanvas extends JComponent {
         setBounds(0, 0, contentComponent.getWidth(), contentComponent.getHeight());
     }
 
-    public void addMask(PropRayIso2NormalMask propRayIso2NormalMask) {
+    public void clearAndAdd(PropRayIso2NormalMask propRayIso2NormalMask) {
+        propRayIso2NormalMasks.clear();
         propRayIso2NormalMasks.add(propRayIso2NormalMask);
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        g.setColor(Color.LIGHT_GRAY);
-        g.setFont(font);
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for (PropRayIso2NormalMask mark : propRayIso2NormalMasks) {

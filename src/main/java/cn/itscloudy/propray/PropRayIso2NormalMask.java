@@ -14,7 +14,6 @@ import java.awt.*;
 public class PropRayIso2NormalMask {
     private static final Key<Font> INLAY_FONT_KEY = Key.create("INLAY_FONT_KEY");
     private static final Key<Font> INLAY_FALLBACK_FONT_KEY = Key.create("INLAY_FALLBACK_FONT_KEY");
-    private final Color markColor = Color.decode("#6391F9");
     private final int requiredHeight;
     private int baseLineY;
     private Font font;
@@ -26,25 +25,27 @@ public class PropRayIso2NormalMask {
     private Rectangle cover;
     private String coveredText;
 
+    private static final Color MARK_COLOR = JBColor.WHITE;
     private static final Color FONT_COLOR =
             new JBColor(new Color(122, 121, 123), new Color(120, 119, 121));
 
-    PropRayIso2NormalMask(Editor editor, int endOffset) {
+    PropRayIso2NormalMask(Editor editor, int endOffset, String newText, String coveredText) {
         this.editor = editor;
         this.endOffset = endOffset;
         this.replacementLayerCanvas = PropRayCanvas.getOrBind(editor);
-        replacementLayerCanvas.addMask(this);
+        replacementLayerCanvas.clearAndAdd(this);
         this.requiredHeight = editor.getLineHeight();
+        updateText(newText, coveredText);
     }
 
     public void paint(Graphics2D g) {
         if (cover == null) {
             return;
         }
-        g.setColor(markColor);
+        g.setColor(MARK_COLOR);
         g.fillRect(cover.x, cover.y, cover.width, cover.height);
         g.setFont(font);
-        g.setColor(FONT_COLOR);
+        g.setColor(JBColor.BLACK);
         g.drawString(newText, cover.x, cover.y + baseLineY);
     }
 
