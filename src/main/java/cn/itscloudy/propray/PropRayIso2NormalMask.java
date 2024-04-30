@@ -3,8 +3,6 @@ package cn.itscloudy.propray;
 import cn.itscloudy.propray.ui.SwingUtil;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.colors.ColorKey;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfoRt;
@@ -29,7 +27,6 @@ public class PropRayIso2NormalMask {
     @Getter
     private final int endOffset;
     private Rectangle cover;
-    private Rectangle blankCover;
     private String coveredText;
 
     private static final Color MARK_COLOR = JBColor.WHITE;
@@ -50,12 +47,6 @@ public class PropRayIso2NormalMask {
         }
         g.setColor(MARK_COLOR);
         g.fillRect(cover.x, cover.y, cover.width, cover.height);
-        Color caretRowColor = EditorColorsManager.getInstance().getSchemeForCurrentUITheme()
-                .getColor(ColorKey.find("CARET_ROW_COLOR"));
-        if (caretRowColor != null) {
-            g.setColor(caretRowColor);
-            g.fillRect(blankCover.x, blankCover.y, blankCover.width, blankCover.height);
-        }
         g.setFont(font);
         g.setColor(FONT_COLOR);
         g.drawString(newText, cover.x, cover.y + baseLineY);
@@ -71,19 +62,11 @@ public class PropRayIso2NormalMask {
 
     public void render() {
         int replacedTextWidth = fontMetrics.stringWidth(coveredText);
-        int newTextRequiredWidth = fontMetrics.stringWidth(newText);
 
         // cover for new text
         Point recTopRight = editor.offsetToXY(endOffset);
         int x = recTopRight.x - replacedTextWidth;
         cover = new Rectangle(x, recTopRight.y, replacedTextWidth, requiredHeight);
-
-        // covert for blank space
-        int blankCoverWidth = replacedTextWidth - newTextRequiredWidth;
-        int x1 = recTopRight.x - blankCoverWidth;
-
-        // width +1 to make sure the caret is not visible
-        blankCover = new Rectangle(x1, recTopRight.y, blankCoverWidth + 1, requiredHeight);
         replacementLayerCanvas.repaint();
     }
 

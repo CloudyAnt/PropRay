@@ -1,6 +1,8 @@
 package cn.itscloudy.propray.ui;
 
+import cn.itscloudy.propray.PrConst;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.util.ReflectionUtil;
 
 import javax.swing.*;
@@ -41,5 +43,37 @@ public class SwingUtil {
     public static Icon findIcon(String path) {
         Class<?> callerClass = ReflectionUtil.getGrandCallerClass();
         return callerClass == null ? null : IconLoader.findIcon(path, callerClass.getClassLoader());
+    }
+
+
+    public static ExtendableTextComponent.Extension createExtension(Icon icon, String tooltipId, Runnable action) {
+        String tooltip = PrConst.get(tooltipId);
+        return new ExtendableTextComponent.Extension() {
+
+            @Override
+            public Icon getIcon(boolean hovered) {
+                return icon;
+            }
+
+            @Override
+            public int getIconGap() {
+                return 8;
+            }
+
+            @Override
+            public boolean isIconBeforeText() {
+                return false;
+            }
+
+            @Override
+            public Runnable getActionOnClick() {
+                return action;
+            }
+
+            @Override
+            public String getTooltip() {
+                return tooltip;
+            }
+        };
     }
 }

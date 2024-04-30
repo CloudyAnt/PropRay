@@ -38,7 +38,7 @@ public class PropRayLineScanAction extends AnAction {
             visualLineEnd -= 1;
         }
 
-        if (PropRayCanvas.getOrBind(editor).removeIfContains(visualLineStart, visualLineEnd)) {
+        if (PropRayCanvas.getOrBind(editor).removeMaskIfContains(visualLineStart, visualLineEnd)) {
             return;
         }
 

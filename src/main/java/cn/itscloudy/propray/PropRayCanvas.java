@@ -54,17 +54,23 @@ public class PropRayCanvas extends JComponent {
         }
     }
 
-    public boolean removeIfContains(int visualLineStart, int visualLineEnd) {
+    public boolean removeMaskIfContains(int start, int end) {
+        List<PropRayIso2NormalMask> removals = new ArrayList<>();
         for (PropRayIso2NormalMask mask : propRayIso2NormalMasks) {
-            if (mask.getStartOffset() == visualLineStart && mask.getEndOffset() == visualLineEnd) {
-                synchronized (modLock) {
-                    propRayIso2NormalMasks.remove(mask);
-                    repaint();
-                }
-                return true;
+            if (mask.getStartOffset() <= start && mask.getEndOffset() >= end) {
+                removals.add(mask);
             }
         }
-        return false;
+
+        if (removals.isEmpty()) {
+            return false;
+        }
+
+        synchronized (modLock) {
+            propRayIso2NormalMasks.removeAll(removals);
+            repaint();
+        }
+        return true;
     }
 
     public void unbind() {

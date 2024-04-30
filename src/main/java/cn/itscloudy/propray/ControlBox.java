@@ -1,15 +1,22 @@
 package cn.itscloudy.propray;
 
 import cn.itscloudy.propray.ui.*;
+import com.intellij.icons.AllIcons;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.Range;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ControlBox {
     private static final int ROOT_Y = 40;
@@ -30,7 +37,8 @@ public class ControlBox {
         root.setVisible(false);
         root.setBorder(JBUI.Borders.emptyRight(SwitchButton.W + RIGHT_OFFSET + 2));
         fullTextScanningCb.addActionListener(e ->
-                ((LineScanPrompt)shortcutPrompt).repaint(fullTextScanningCb.isSelected()));
+                ((LineScanPrompt) shortcutPrompt).repaint(fullTextScanningCb.isSelected()));
+        fullTextScanningCb.setVisible(false);
     }
 
     private void createUIComponents() {
@@ -51,6 +59,7 @@ public class ControlBox {
         Root() {
             setOpaque(false);
         }
+
         @Override
         public void setBounds(int x, int y, int width, int height) {
             super.setBounds(x, ROOT_Y, width, height);
@@ -83,23 +92,48 @@ public class ControlBox {
         }
     }
 
-    private class SearchField extends JTextField {
+    private class SearchField extends ExtendableTextField {
+
+        private final Border normalBorder = new RoundCornerBorder(8, 1, BORDER_COLOR);
+        private final Border noResultBorder = new RoundCornerBorder(8, 1, JBColor.RED);
+
+        private final java.util.List<Extension> moreThan1Extensions = new ArrayList<>();
+        private final java.util.List<Extension> lessThan1Extension = Collections.emptyList();
 
         SearchField() {
+            setBorder(normalBorder);
+            Icon prevOccurenceIcon = AllIcons.Actions.PreviousOccurence;
+            Icon nextOccurenceIcon = AllIcons.Actions.NextOccurence;
+            moreThan1Extensions.add(SwingUtil.createExtension(prevOccurenceIcon, "Extension.GotoPrev", () -> {
+                // TODO find previous
+            }));
+            moreThan1Extensions.add(SwingUtil.createExtension(nextOccurenceIcon, "Extension.GotoNext", () -> {
+                // TODO find next
+            }));
+
             addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyTyped(KeyEvent e) {
-                    super.keyTyped(e);
-                }
-
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    super.keyPressed(e);
-                }
-
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    super.keyReleased(e);
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                        String text = getText();
+                        if (text.isEmpty()) {
+                            return;
+                        }
+                        List<Range<Integer>> searchResults = search(text);
+                        if (searchResults.size() > 1) {
+                            setExtensions(moreThan1Extensions);
+                            setBorder(normalBorder);
+                        } else if (searchResults.size() == 1) {
+                            setExtensions(lessThan1Extension);
+                            setBorder(normalBorder);
+                        } else {
+                            setExtensions(lessThan1Extension);
+                            setBorder(noResultBorder);
+                        }
+                    } else {
+                        setExtensions(lessThan1Extension);
+                        setBorder(normalBorder);
+                    }
                 }
             });
             addFocusListener(new FocusAdapter() {
@@ -116,6 +150,25 @@ public class ControlBox {
             String prompt = PrConst.get("SearchPrompt");
             TextPrompt tp = new TextPrompt(prompt, this, JBUI.insets(4, 7, 0, 0));
             tp.setForeground(SHADOW_HINT_COLOR);
+        }
+
+        int i = 0;
+
+        private java.util.List<Range<Integer>> search(String text) {
+            // TODO search
+            i++;
+            if (i % 3 == 0) {
+                ArrayList<Range<Integer>> arr = new ArrayList<>();
+                arr.add(new Range<>(0, 5));
+                arr.add(new Range<>(0, 10));
+                return arr;
+            }
+            if (i % 2 == 0) {
+                ArrayList<Range<Integer>> arr = new ArrayList<>();
+                arr.add(new Range<>(0, 5));
+                return arr;
+            }
+            return Collections.emptyList();
         }
     }
 
