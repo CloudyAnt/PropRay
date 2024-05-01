@@ -23,6 +23,7 @@ public class ControlBox {
     private static final int RIGHT_OFFSET = 40;
     private static final Color BORDER_COLOR = Color.decode("#00818F");
     public static final JBColor SHADOW_HINT_COLOR = new JBColor(Gray.x8C, Gray.x99);
+    private final PropRayEditorConsul editorConsul;
 
     @Getter
     private JPanel root;
@@ -33,7 +34,8 @@ public class ControlBox {
     @Getter
     private JComponent switchButton;
 
-    ControlBox() {
+    ControlBox(PropRayEditorConsul editorConsul) {
+        this.editorConsul = editorConsul;
         root.setVisible(false);
         root.setBorder(JBUI.Borders.emptyRight(SwitchButton.W + RIGHT_OFFSET + 2));
         fullTextScanningCb.addActionListener(e ->
@@ -98,18 +100,16 @@ public class ControlBox {
         private final Border noResultBorder = new RoundCornerBorder(8, 1, JBColor.RED);
 
         private final java.util.List<Extension> moreThan1Extensions = new ArrayList<>();
-        private final java.util.List<Extension> lessThan1Extension = Collections.emptyList();
+        private final transient java.util.List<Extension> lessThan1Extension = Collections.emptyList();
 
         SearchField() {
             setBorder(normalBorder);
             Icon prevOccurenceIcon = AllIcons.Actions.PreviousOccurence;
             Icon nextOccurenceIcon = AllIcons.Actions.NextOccurence;
-            moreThan1Extensions.add(SwingUtil.createExtension(prevOccurenceIcon, "Extension.GotoPrev", () -> {
-                // TODO find previous
-            }));
-            moreThan1Extensions.add(SwingUtil.createExtension(nextOccurenceIcon, "Extension.GotoNext", () -> {
-                // TODO find next
-            }));
+            moreThan1Extensions.add(SwingUtil.createExtension(prevOccurenceIcon, "Extension.GotoPrev", () ->
+                    editorConsul.goToSearchResult(-1)));
+            moreThan1Extensions.add(SwingUtil.createExtension(nextOccurenceIcon, "Extension.GotoNext", () ->
+                    editorConsul.goToSearchResult(1)));
 
             addKeyListener(new KeyAdapter() {
                 @Override
@@ -119,7 +119,7 @@ public class ControlBox {
                         if (text.isEmpty()) {
                             return;
                         }
-                        List<Range<Integer>> searchResults = search(text);
+                        List<Range<Integer>> searchResults = editorConsul.search(text);
                         if (searchResults.size() > 1) {
                             setExtensions(moreThan1Extensions);
                             setBorder(normalBorder);
@@ -150,25 +150,6 @@ public class ControlBox {
             String prompt = PrConst.get("SearchPrompt");
             TextPrompt tp = new TextPrompt(prompt, this, JBUI.insets(4, 7, 0, 0));
             tp.setForeground(SHADOW_HINT_COLOR);
-        }
-
-        int i = 0;
-
-        private java.util.List<Range<Integer>> search(String text) {
-            // TODO search
-            i++;
-            if (i % 3 == 0) {
-                ArrayList<Range<Integer>> arr = new ArrayList<>();
-                arr.add(new Range<>(0, 5));
-                arr.add(new Range<>(0, 10));
-                return arr;
-            }
-            if (i % 2 == 0) {
-                ArrayList<Range<Integer>> arr = new ArrayList<>();
-                arr.add(new Range<>(0, 5));
-                return arr;
-            }
-            return Collections.emptyList();
         }
     }
 

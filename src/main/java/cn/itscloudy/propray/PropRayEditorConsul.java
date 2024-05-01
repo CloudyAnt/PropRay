@@ -4,21 +4,22 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.ui.components.JBLayeredPane;
+import com.intellij.util.Range;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collections;
 
-public class PropRayEditorAffairs {
-    private static final Key<PropRayEditorAffairs> KEY = Key.create(PropRayEditorAffairs.class.getName());
+public class PropRayEditorConsul {
+    public static final Key<PropRayEditorConsul> KEY = Key.create(PropRayEditorConsul.class.getName());
 
     private final Editor editor;
-    private final JBLayeredPane layeredPane;
 
-    private PropRayEditorAffairs(Editor editor, JBLayeredPane layeredPane) {
+    private PropRayEditorConsul(Editor editor) {
         this.editor = editor;
-        this.layeredPane = layeredPane;
     }
 
     static void install(Editor editor) {
@@ -30,9 +31,11 @@ public class PropRayEditorAffairs {
             }
         }
 
-        PropRayEditorAffairs propRayEditorAffairs = new PropRayEditorAffairs(editor, (JBLayeredPane) comp);
-        editor.putUserData(KEY, propRayEditorAffairs);
-        ApplicationManager.getApplication().executeOnPooledThread(propRayEditorAffairs::init);
+        PropRayEditorConsul propRayEditorConsul = new PropRayEditorConsul(editor);
+        editor.putUserData(KEY, propRayEditorConsul);
+
+        final JBLayeredPane layeredPane = (JBLayeredPane) comp;
+        ApplicationManager.getApplication().executeOnPooledThread(() -> propRayEditorConsul.init(layeredPane));
     }
 
     static void uninstall(Editor editor) {
@@ -40,8 +43,8 @@ public class PropRayEditorAffairs {
     }
 
 
-    void init() {
-        ControlBox controlBox = new ControlBox();
+    void init(JBLayeredPane layeredPane) {
+        ControlBox controlBox = new ControlBox(this);
         JComponent switchButton = controlBox.getSwitchButton();
         layeredPane.add(switchButton);
         layeredPane.setLayer(switchButton, 100);
@@ -57,5 +60,24 @@ public class PropRayEditorAffairs {
                 PropRayCanvas.getOrBind(editor).clear();
             }
         });
+    }
+
+    void afterSelection(TextRange range) {
+        int startOffset = range.getStartOffset();
+        int endOffset = range.getEndOffset();
+        if (startOffset == endOffset) {
+            return;
+        }
+        PropRayCanvas.getOrBind(editor).removeMaskIfContains(startOffset, endOffset);
+    }
+
+    java.util.List<Range<Integer>> search(String str) {
+        // TODO search
+        return Collections.emptyList();
+    }
+
+    public boolean goToSearchResult(int offset) {
+        // TODO jump to occurence
+        return true;
     }
 }

@@ -13,7 +13,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
@@ -75,14 +74,10 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
             eventMulticaster.addSelectionListener(new SelectionListener() {
                 @Override
                 public void selectionChanged(@NotNull SelectionEvent e) {
-                    TextRange newRange = e.getNewRange();
-                    int startOffset = newRange.getStartOffset();
-                    int endOffset = newRange.getEndOffset();
-                    if (startOffset == endOffset) {
-                        return;
+                    PropRayEditorConsul editorConsul = e.getEditor().getUserData(PropRayEditorConsul.KEY);
+                    if (editorConsul != null) {
+                        editorConsul.afterSelection(e.getNewRange());
                     }
-                    PropRayCanvas.getOrBind(e.getEditor())
-                            .removeMaskIfContains(startOffset, endOffset);
                 }
             }, this);
         }
@@ -105,12 +100,12 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
             if (virtualFile == null || !"properties".equals(virtualFile.getExtension())) {
                 return;
             }
-            PropRayEditorAffairs.install(editor);
+            PropRayEditorConsul.install(editor);
         }
 
         @Override
         public void editorReleased(@NotNull EditorFactoryEvent event) {
-            PropRayEditorAffairs.uninstall(event.getEditor());
+            PropRayEditorConsul.uninstall(event.getEditor());
         }
     }
 
