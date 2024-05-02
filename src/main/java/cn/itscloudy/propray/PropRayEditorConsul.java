@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Collections;
 
 public class PropRayEditorConsul {
@@ -71,12 +72,20 @@ public class PropRayEditorConsul {
         PropRayCanvas.getOrBind(editor).removeMaskIfContains(startOffset, endOffset);
     }
 
-    java.util.List<Range<Integer>> search(String str) {
-        // TODO search
-        return Collections.emptyList();
+    void afterVisibleAreaChanged() {
+        PropRayCanvas.getOrBind(editor).clear();
     }
 
-    public boolean goToSearchResult(int offset) {
+    java.util.List<Range<Integer>> searchResults = new ArrayList<>();
+
+    int search(String str) {
+        String text = editor.getDocument().getText();
+        String normal = PropRayUtil.toNormal(text);
+
+        return searchResults.size();
+    }
+
+    boolean goToSearchResult(int offset) {
         // TODO jump to occurence
         return true;
     }

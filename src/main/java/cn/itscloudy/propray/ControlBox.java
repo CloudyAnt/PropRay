@@ -119,11 +119,11 @@ public class ControlBox {
                         if (text.isEmpty()) {
                             return;
                         }
-                        List<Range<Integer>> searchResults = editorConsul.search(text);
-                        if (searchResults.size() > 1) {
+                        int resultSize = editorConsul.search(text);
+                        if (resultSize > 1) {
                             setExtensions(moreThan1Extensions);
                             setBorder(normalBorder);
-                        } else if (searchResults.size() == 1) {
+                        } else if (resultSize == 1) {
                             setExtensions(lessThan1Extension);
                             setBorder(normalBorder);
                         } else {

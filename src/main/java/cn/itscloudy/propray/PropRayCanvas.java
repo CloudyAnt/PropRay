@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.SoftWrap;
 import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
-import org.apache.commons.lang3.StringUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;

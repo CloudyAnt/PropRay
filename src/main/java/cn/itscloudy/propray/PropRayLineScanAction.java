@@ -43,7 +43,7 @@ public class PropRayLineScanAction extends AnAction {
         }
 
         String normal = PropRayUtil.toNormal(iso);
-        new PropRayIso2NormalMask(editor, visualLineEnd, normal, iso).render();
+        new PropRayIso2NormalMask(editor, visualLineStart, normal, iso).render();
     }
 
 }

@@ -1,7 +1,6 @@
 package cn.itscloudy.propray;
 
 import cn.itscloudy.propray.ui.SwingUtil;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.util.Key;
@@ -31,10 +30,10 @@ public class PropRayIso2NormalMask {
 
     private static final Color MARK_COLOR = JBColor.WHITE;
     private static final Color FONT_COLOR = JBColor.BLACK;
-    PropRayIso2NormalMask(Editor editor, int endOffset, String newText, String coveredText) {
+    PropRayIso2NormalMask(Editor editor, int visualStartOffset, String newText, String coveredText) {
         this.editor = editor;
-        this.startOffset = endOffset - coveredText.length();
-        this.endOffset = endOffset;
+        this.startOffset = visualStartOffset;
+        this.endOffset = visualStartOffset + coveredText.length();
         this.replacementLayerCanvas = PropRayCanvas.getOrBind(editor);
         replacementLayerCanvas.clearAndAdd(this);
         this.requiredHeight = editor.getLineHeight();
@@ -56,7 +55,7 @@ public class PropRayIso2NormalMask {
         this.newText = newText.replace("\t", "    ").replace("\r", "");
         this.coveredText = coveredText;
         this.font = getFont(editor, this.newText);
-        this.fontMetrics = editor.getContentComponent().getFontMetrics(this.font);
+        fontMetrics = editor.getContentComponent().getFontMetrics(this.font);
         this.baseLineY = SwingUtil.getBaselineY(fontMetrics, requiredHeight);
     }
 
@@ -64,18 +63,9 @@ public class PropRayIso2NormalMask {
         int replacedTextWidth = fontMetrics.stringWidth(coveredText);
 
         // cover for new text
-        Point recTopRight = editor.offsetToXY(endOffset);
-        int x = recTopRight.x - replacedTextWidth;
-        cover = new Rectangle(x, recTopRight.y, replacedTextWidth, requiredHeight);
+        Point recTopLeft = editor.offsetToXY(startOffset);
+        cover = new Rectangle(recTopLeft.x, recTopLeft.y, replacedTextWidth, requiredHeight);
         replacementLayerCanvas.repaint();
-    }
-
-    public void modifyDocument(Document document) {
-        document.replaceString(startOffset, endOffset, newText);
-    }
-
-    public int getAfterModificationEndOffset() {
-        return endOffset + newText.length() - coveredText.length();
     }
 
     public static Font getFont(Editor editor, String text) {
