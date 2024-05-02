@@ -2,7 +2,6 @@ package cn.itscloudy.propray;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SoftWrap;
-import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import org.codehaus.plexus.util.StringUtils;
@@ -11,14 +10,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class PropRayCanvas extends JComponent {
 
     private final transient Editor editor;
     private static final Key<PropRayCanvas> KEY = Key.create("PropRayCanvas");
-    private final List<PropRayIso2NormalMask> propRayIso2NormalMasks = new ArrayList<>();
-    private final Font font;
+    private final List<PropRayMask> masks = new ArrayList<>();
     private final transient Object modLock = new Object();
 
     PropRayCanvas(Editor editor) {
@@ -26,7 +23,6 @@ public class PropRayCanvas extends JComponent {
         JComponent contentComponent = editor.getContentComponent();
         contentComponent.add(this);
         updateBounds();
-        font = editor.getColorsScheme().getFont(EditorFontType.PLAIN);
     }
 
     public static PropRayCanvas getOrBind(Editor editor) {
@@ -40,23 +36,14 @@ public class PropRayCanvas extends JComponent {
         return canvas;
     }
 
-    public static void ifBind(Editor editor, Consumer<PropRayCanvas> consumer) {
-        PropRayCanvas canvas = editor.getUserData(KEY);
-        if (canvas != null) {
-            consumer.accept(canvas);
-        }
-    }
-
-    public static void unbind(Editor editor) {
-        PropRayCanvas canvas = editor.getUserData(KEY);
-        if (canvas != null) {
-            canvas.unbind();
-        }
+    public void updateBounds() {
+        JComponent contentComponent = editor.getContentComponent();
+        setBounds(0, 0, contentComponent.getWidth(), contentComponent.getHeight());
     }
 
     public boolean removeMaskIfContains(int start, int end) {
-        List<PropRayIso2NormalMask> removals = new ArrayList<>();
-        for (PropRayIso2NormalMask mask : propRayIso2NormalMasks) {
+        List<PropRayMask> removals = new ArrayList<>();
+        for (PropRayMask mask : masks) {
             if (mask.getStartOffset() <= start && mask.getEndOffset() >= end) {
                 removals.add(mask);
             }
@@ -67,43 +54,41 @@ public class PropRayCanvas extends JComponent {
         }
 
         synchronized (modLock) {
-            propRayIso2NormalMasks.removeAll(removals);
+            masks.removeAll(removals);
             repaint();
         }
         return true;
     }
 
-    public void unbind() {
-        removeAll();
-        editor.putUserData(KEY, null);
-    }
-
-    public void updateBounds() {
-        JComponent contentComponent = editor.getContentComponent();
-        setBounds(0, 0, contentComponent.getWidth(), contentComponent.getHeight());
-    }
-
     public void clear() {
-        if (propRayIso2NormalMasks.isEmpty()) {
+        if (masks.isEmpty()) {
             return;
         }
         synchronized (modLock) {
-            propRayIso2NormalMasks.clear();
+            masks.clear();
             repaint();
         }
     }
 
-    public void clearAndAdd(PropRayIso2NormalMask propRayIso2NormalMask) {
-        propRayIso2NormalMasks.clear();
-        propRayIso2NormalMasks.add(propRayIso2NormalMask);
+    public void add(PropRayMask mask) {
+        synchronized (modLock) {
+            masks.add(mask);
+        }
+    }
+
+    public void clearAndAdd(PropRayMask mask) {
+        synchronized (modLock) {
+            masks.clear();
+            masks.add(mask);
+        }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        for (PropRayIso2NormalMask mark : propRayIso2NormalMasks) {
-            mark.paint(g2);
+        for (PropRayMask mark : masks) {
+            mark.paintBy(g2);
         }
     }
 

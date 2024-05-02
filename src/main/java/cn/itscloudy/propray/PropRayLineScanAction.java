@@ -20,11 +20,13 @@ public class PropRayLineScanAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Editor editor = e.getData(CommonDataKeys.EDITOR);
-        boolean act = editor != null
-                && "properties".equals(editor.getVirtualFile().getExtension());
+        boolean editorNotNull = editor != null;
+        boolean act = editorNotNull && "properties".equals(editor.getVirtualFile().getExtension());
         if (act) {
             act(editor);
         }
+
+        PropRayEditorConsul.hideControlBoxOf(editor);
     }
 
     private void act(Editor editor) {
@@ -38,12 +40,15 @@ public class PropRayLineScanAction extends AnAction {
             visualLineEnd -= 1;
         }
 
-        if (PropRayCanvas.getOrBind(editor).removeMaskIfContains(visualLineStart, visualLineEnd)) {
+        PropRayCanvas canvas = PropRayCanvas.getOrBind(editor);
+        if (canvas.removeMaskIfContains(visualLineStart, visualLineEnd)) {
             return;
         }
 
         String normal = PropRayUtil.toNormal(iso);
-        new PropRayIso2NormalMask(editor, visualLineStart, normal, iso).render();
+        PropRayIso2NormalMask mask = new PropRayIso2NormalMask(editor, visualLineStart, normal, iso);
+        canvas.clearAndAdd(mask);
+        canvas.repaint();
     }
 
 }

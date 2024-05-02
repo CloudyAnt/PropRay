@@ -2,6 +2,7 @@ package cn.itscloudy.propray;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -16,6 +17,8 @@ public interface PrConst {
 
     Map<String, String> LOCALES = new HashMap<>();
     Pattern VAR_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
+
+    Color MAIN_COLOR = Color.decode("#00818F");
 
     static String get(String key) {
         if (LOCALES.containsKey(key)) {

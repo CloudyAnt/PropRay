@@ -33,6 +33,8 @@ public class PropRayNormal2IsoAction extends AnAction {
             int end = selectionModel.getSelectionEnd();
             editor.getDocument().replaceString(offset, end, isoText);
         });
+
+        PropRayEditorConsul.hideControlBoxOf(editor);
     }
 
     @Override

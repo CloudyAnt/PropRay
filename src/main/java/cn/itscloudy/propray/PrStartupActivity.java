@@ -80,13 +80,6 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
                     }
                 }
             }, this);
-
-            eventMulticaster.addVisibleAreaListener(e -> {
-                PropRayEditorConsul editorConsul = e.getEditor().getUserData(PropRayEditorConsul.KEY);
-                if (editorConsul != null) {
-                    editorConsul.afterVisibleAreaChanged();
-                }
-            });
         }
     }
 

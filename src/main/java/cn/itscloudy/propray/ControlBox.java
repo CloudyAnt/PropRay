@@ -6,7 +6,6 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.fields.ExtendableTextField;
-import com.intellij.util.Range;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 
@@ -16,12 +15,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class ControlBox {
     private static final int ROOT_Y = 40;
     private static final int RIGHT_OFFSET = 40;
-    private static final Color BORDER_COLOR = Color.decode("#00818F");
     public static final JBColor SHADOW_HINT_COLOR = new JBColor(Gray.x8C, Gray.x99);
     private final PropRayEditorConsul editorConsul;
 
@@ -47,13 +44,17 @@ public class ControlBox {
         root = new Root();
         switchButton = new SwitchButton();
         ArrowBubbleBorder.Direction bubbleDirection = ArrowBubbleBorder.Direction.RIGHT;
-        content = new ArrowBubbleBorderPanel(new ArrowBubbleBorder(bubbleDirection, 5, BORDER_COLOR));
+        content = new ArrowBubbleBorderPanel(new ArrowBubbleBorder(bubbleDirection, 5, PrConst.MAIN_COLOR));
         searchField = new SearchField();
         shortcutPrompt = new LineScanPrompt();
     }
 
-    public void afterKeyTyped(KeyEvent keyEvent) {
+    void afterKeyTyped(KeyEvent keyEvent) {
         searchField.dispatchEvent(keyEvent);
+    }
+
+    void hideRoot() {
+        root.setVisible(false);
     }
 
     private static class Root extends JBPanel<Root> {
@@ -83,7 +84,13 @@ public class ControlBox {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    root.setVisible(!root.isVisible());
+                    boolean visible = !root.isVisible();
+                    root.setVisible(visible);
+                    editorConsul.clearSearchResults();
+                    if (visible) {
+                        searchField.setText("");
+                        searchField.grabFocus();
+                    }
                 }
             });
         }
@@ -96,7 +103,7 @@ public class ControlBox {
 
     private class SearchField extends ExtendableTextField {
 
-        private final Border normalBorder = new RoundCornerBorder(8, 1, BORDER_COLOR);
+        private final Border normalBorder = new RoundCornerBorder(8, 1, PrConst.MAIN_COLOR);
         private final Border noResultBorder = new RoundCornerBorder(8, 1, JBColor.RED);
 
         private final java.util.List<Extension> moreThan1Extensions = new ArrayList<>();

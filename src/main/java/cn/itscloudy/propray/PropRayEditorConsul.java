@@ -2,25 +2,28 @@ package cn.itscloudy.propray;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.ui.components.JBLayeredPane;
-import com.intellij.util.Range;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class PropRayEditorConsul {
     public static final Key<PropRayEditorConsul> KEY = Key.create(PropRayEditorConsul.class.getName());
 
     private final Editor editor;
+    private final PropRayCanvas canvas;
+    private final ControlBox controlBox;
 
     private PropRayEditorConsul(Editor editor) {
         this.editor = editor;
+        canvas = PropRayCanvas.getOrBind(editor);
+        controlBox = new ControlBox(this);
     }
 
     static void install(Editor editor) {
@@ -45,7 +48,6 @@ public class PropRayEditorConsul {
 
 
     void init(JBLayeredPane layeredPane) {
-        ControlBox controlBox = new ControlBox(this);
         JComponent switchButton = controlBox.getSwitchButton();
         layeredPane.add(switchButton);
         layeredPane.setLayer(switchButton, 100);
@@ -58,7 +60,7 @@ public class PropRayEditorConsul {
         editor.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(@NotNull DocumentEvent event) {
-                PropRayCanvas.getOrBind(editor).clear();
+                canvas.clear();
             }
         });
     }
@@ -69,24 +71,64 @@ public class PropRayEditorConsul {
         if (startOffset == endOffset) {
             return;
         }
-        PropRayCanvas.getOrBind(editor).removeMaskIfContains(startOffset, endOffset);
+        canvas.removeMaskIfContains(startOffset, endOffset);
     }
 
-    void afterVisibleAreaChanged() {
-        PropRayCanvas.getOrBind(editor).clear();
-    }
-
-    java.util.List<Range<Integer>> searchResults = new ArrayList<>();
+    java.util.List<PropRaySearchResultMask> searchResults = new ArrayList<>();
+    int currentSearchResultIndex = 0;
 
     int search(String str) {
-        String text = editor.getDocument().getText();
-        String normal = PropRayUtil.toNormal(text);
+        clearSearchResults();
 
+        String isoStr = PropRayUtil.toIso(str);
+        String text = editor.getDocument().getText();
+
+        int idx = text.indexOf(isoStr);
+        int num = 0;
+        while (idx != -1) {
+            PropRaySearchResultMask mask = new PropRaySearchResultMask(editor, idx, isoStr);
+            mask.setCurrent(num == currentSearchResultIndex);
+
+            searchResults.add(mask);
+            canvas.add(mask);
+            idx = text.indexOf(isoStr, idx + 1);
+
+            num++;
+        }
+
+        if (!searchResults.isEmpty()) {
+            canvas.repaint();
+        }
         return searchResults.size();
     }
 
-    boolean goToSearchResult(int offset) {
-        // TODO jump to occurence
-        return true;
+    void clearSearchResults() {
+        searchResults.clear();
+        canvas.clear();
+        currentSearchResultIndex = 0;
+    }
+
+    void goToSearchResult(int offset) {
+        searchResults.get(currentSearchResultIndex).setCurrent(false);
+        int idx = currentSearchResultIndex + offset;
+        if (idx < 0) {
+            idx = searchResults.size() - 1;
+        } else if (idx >= searchResults.size()) {
+            idx = idx % searchResults.size();
+        }
+        searchResults.get(idx).setCurrent(true);
+        currentSearchResultIndex = idx;
+        canvas.repaint();
+    }
+
+    static void hideControlBoxOf(Editor editor) {
+        if (editor == null) {
+            return;
+        }
+
+        PropRayEditorConsul editorConsul = editor.getUserData(PropRayEditorConsul.KEY);
+        if (editorConsul != null) {
+            editorConsul.controlBox.hideRoot();
+        }
     }
 }
