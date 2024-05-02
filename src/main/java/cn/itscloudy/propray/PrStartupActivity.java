@@ -14,6 +14,7 @@ import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.encoding.EncodingManager;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class PrStartupActivity implements StartupActivity, ProjectActivity {
 
@@ -51,8 +54,11 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
     }
 
     public static class InitTask extends Task.Backgroundable implements Disposable {
+        private final Project project;
+
         public InitTask(@NotNull Project project) {
             super(project, PrConst.get("Init"));
+            this.project = project;
         }
 
         @Override
@@ -62,11 +68,11 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
 
         @Override
         public void run(@NotNull ProgressIndicator progressIndicator) {
-            PrEditorFactoryListener factoryListener = new PrEditorFactoryListener();
-            EditorFactory.getInstance().addEditorFactoryListener(factoryListener,this);
+            PrEditorFactoryListener factoryListener = new PrEditorFactoryListener(project);
+            EditorFactory.getInstance().addEditorFactoryListener(factoryListener, this);
             Editor[] allEditors = EditorFactory.getInstance().getAllEditors();
             for (Editor editor : allEditors) {
-                PrEditorFactoryListener.init(editor);
+                factoryListener.init(editor);
             }
 
             IdeEventQueue.getInstance().addDispatcher(new PrEventDispatcher(), this);
@@ -85,19 +91,33 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
 
     public static class PrEditorFactoryListener implements EditorFactoryListener {
         private static final Key<Boolean> INITIALIZED = Key.create("PrEditorFactoryListener.INITIALIZED");
+        private final Project project;
+
+        PrEditorFactoryListener(Project project) {
+            this.project = project;
+        }
 
         @Override
         public void editorCreated(@NotNull EditorFactoryEvent event) {
             init(event.getEditor());
         }
 
-        public static void init(@NotNull Editor editor) {
+        public void init(@NotNull Editor editor) {
             if (editor.getUserData(INITIALIZED) != null) {
                 return;
             }
             editor.putUserData(INITIALIZED, true);
             VirtualFile virtualFile = editor.getVirtualFile();
             if (virtualFile == null || !"properties".equals(virtualFile.getExtension())) {
+                return;
+            }
+
+            Charset encoding = EncodingManager.getInstance().getEncoding(virtualFile, false);
+            if (!StandardCharsets.ISO_8859_1.equals(encoding)) {
+                /*
+                 * properties file are normally wrote in iso_8859_1 encoding.
+                 * So unless it's ascii, it's no need any convert
+                 */
                 return;
             }
             PropRayEditorConsul.install(editor);
