@@ -111,15 +111,6 @@ public class PrStartupActivity implements StartupActivity, ProjectActivity {
             if (virtualFile == null || !"properties".equals(virtualFile.getExtension())) {
                 return;
             }
-
-            Charset encoding = EncodingManager.getInstance().getEncoding(virtualFile, false);
-            if (!StandardCharsets.ISO_8859_1.equals(encoding)) {
-                /*
-                 * properties file are normally wrote in iso_8859_1 encoding.
-                 * So unless it's ascii, it's no need any convert
-                 */
-                return;
-            }
             PropRayEditorConsul.install(editor);
         }
 
